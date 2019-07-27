@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "/Users/mahesh.kulkarni/projects/github-projects/react-projects"
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#c32a85",
+			"activityBar.foreground": "#e7e7e7",
+			"activityBar.inactiveForeground": "#e7e7e799",
+			"titleBar.activeBackground": "#992168",
+			"titleBar.inactiveBackground": "#99216899",
+			"titleBar.activeForeground": "#e7e7e7",
+			"titleBar.inactiveForeground": "#e7e7e799",
+			"statusBar.background": "#992168",
+			"statusBarItem.hoverBackground": "#c32a85",
+			"statusBar.foreground": "#e7e7e7"
+		}
+	}
+}
