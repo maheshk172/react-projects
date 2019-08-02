@@ -1,0 +1,93 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import * as courseActions from '../../redux/actions/courseActions';
+import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
+
+class CoursesPage extends React.Component {
+  state = {
+    course: {
+      title: ''
+    }
+  };
+
+  handleChange = event => {
+    const course = { ...this.state.course, title: event.target.value };
+    this.setState({ course: course });
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+    // We omitted the mapDispatchToProps, so default dispatch is added to props
+    //debugger;
+    // when const mapDispatchToProps is not provided, dispatch is directly available
+    //this.props.dispatch(courseActions.createCourse(this.state.course));
+
+    /* OR */
+    // now we provided the mapDispatchToProps, createCourse is directly available
+    //this.props.createCourse(this.state.course);
+
+    /* OR */
+    // Now we have used the bindActionCreators, so all actions mapped
+    this.props.actions.createCourse(this.state.course);
+  };
+
+  render() {
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <h2>Courses</h2>
+        <h3> Add Course </h3>
+        <input
+          type="Text"
+          value={this.state.course.title}
+          // created a new function here, Bad Bad
+          //onChange={this.handleChange.bind(this)}
+          onChange={this.handleChange}
+        />
+
+        <input type="submit" value="Save" />
+
+        <br />
+        {this.props.courses.map(course => {
+          return <div key={course.title}>{course.title}</div>;
+        })}
+      </form>
+    );
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    createCourse: course => {
+      // action need to be wrapped in the dispatch method, ow redux will not know
+      dispatch(courseActions.createCourse(course));
+    },
+    // This is alternative to the dispatch method above
+    // all actions from courseActions is mapped to the props
+    actions: bindActionCreators(courseActions, dispatch)
+  };
+};
+
+// ownprops - component's own props
+const mapStateToProps = state => {
+  //debugger;
+  return {
+    courses: state.courses
+  };
+};
+
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  createCourse: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired
+  //dispatch: PropTypes.func
+};
+
+//const connectStateAndProps = connect(mapStateToProps);
+const connectStateAndProps = connect(
+  mapStateToProps,
+  mapDispatchToProps
+);
+
+//connecting store with the component
+export default connectStateAndProps(CoursesPage);

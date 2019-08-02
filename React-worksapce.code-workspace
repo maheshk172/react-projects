@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "path": "sample-react-app"
+    },
+    {
+      "path": "sample-react-ejected-app"
+    },
+    {
+      "path": "ps-redux"
+    },
+    {
+      "path": "ps-flux"
+    }
+  ]
+}

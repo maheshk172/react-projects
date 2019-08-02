@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import CourseForm from "./CourseForm";
 // import { Prompt } from "react-router-dom";
-import * as courseApi from "../../../api/courseApi";
+// import * as courseApi from "../../../api/courseApi";
 import { toast } from "react-toastify";
+import courseStore from "../../../stores/courseStore";
+import * as courseActions from "../../../actions/courseActions";
 
 const ManageCoursePage = props => {
   const [errors, setErrors] = useState({});
+  const [courses, setCourses] = useState(courseStore.getCourses());
   const [course, setCourse] = useState({
     id: null,
     title: "",
@@ -15,7 +18,7 @@ const ManageCoursePage = props => {
   });
 
   // const handleTitleChange = event => {
-  //   //debugger;
+  //   ////debugger;
   //   const updatedCourse = { ...course };
   //   updatedCourse.title = event.target.value;
   //   setCourse(updatedCourse);
@@ -23,7 +26,7 @@ const ManageCoursePage = props => {
   // };
 
   // const handleCategoryChange = event => {
-  //   //debugger;
+  //   ////debugger;
   //   // lets use spread operator with updatd prop
   //   const updatedCourse = { ...course, category: event.target.value };
   //   //updatedCourse.category = event.target.value;
@@ -32,25 +35,41 @@ const ManageCoursePage = props => {
   // };
 
   // const handleAuthorChange = event => {
-  //   //debugger;
+  //   ////debugger;
   //   const updatedCourse = { ...course, authorId: event.target.value };
   //   setCourse(updatedCourse);
   //   console.log(3);
   // };
 
   useEffect(() => {
+    courseStore.addChangeListener(onChange);
     const slug = props.match.params.slug; // /course/:slug
-    if (slug) {
-      courseApi
-        .getCourseBySlug(slug)
-        .then(setCourse)
-        .catch(error => {
-          const errorMessage = "Unable to fetch Course by slug: " + error;
-          console.log(errorMessage);
-          toast.error(errorMessage);
-        });
+    //   if (slug) {
+    //     // courseApi
+    //     //   .getCourseBySlug(slug)
+    //     //   .then(setCourse)
+    //     //   .catch(error => {
+    //     //     const errorMessage = "Unable to fetch Course by slug: " + error;
+    //     //     console.log(errorMessage);
+    //     //     toast.error(errorMessage);
+    //     //   });
+    //     setCourse(courseStore.getCourseBySlug(slug));
+    //  }
+
+    if (courses.length === 0) {
+      courseActions.loadCourses();
+    } else if (slug) {
+      setCourse(courseStore.getCourseBySlug(slug));
     }
-  }, [props.match.params.slug]);
+
+    function onChange() {
+      setCourses(courseStore.getCourses());
+    }
+
+    return () => {
+      courseStore.removeChangeListener(onChange);
+    };
+  }, [courses.length, props.match.params.slug]);
 
   const handleInputChange = event => {
     //This should have worked as well
@@ -61,7 +80,7 @@ const ManageCoursePage = props => {
   };
 
   const isFormValid = () => {
-    debugger;
+    //debugger;
     const _errors = [];
     if (course.title === "") _errors["title"] = "Title is required";
     if (course.category === "") _errors["category"] = "Category is required";
@@ -72,10 +91,14 @@ const ManageCoursePage = props => {
   };
 
   const handleSubmit = event => {
-    //debugger;
+    ////debugger;
     event.preventDefault();
     if (isFormValid()) {
-      courseApi.saveCourse(course).then(() => {
+      // courseApi.saveCourse(course).then(() => {
+      //   props.history.push("/courses");
+      //   toast.success("Course has been saved.");
+      // });
+      courseActions.saveCourse(course).then(() => {
         props.history.push("/courses");
         toast.success("Course has been saved.");
       });
