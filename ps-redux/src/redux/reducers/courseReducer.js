@@ -1,4 +1,4 @@
-import ActionTypes from '../actions/ActionTypes';
+import * as ActionTypes from '../actions/ActionTypes';
 import initialState from './initialState';
 
 // default state = []
@@ -17,6 +17,9 @@ export default function courseReducer(state = initialState.courses, action) {
       return state.map(course =>
         course.id === action.course.id ? action.course : course
       );
+
+    case ActionTypes.DELETE_COURSE_OPTIMISTIC:
+      return state.filter(course => course.id !== action.course.id);
 
     default:
       return state;

@@ -12,5 +12,8 @@
     {
       "path": "ps-flux"
     }
-  ]
+  ],
+  "settings": {
+    "workbench.colorCustomizations": {}
+  }
 }

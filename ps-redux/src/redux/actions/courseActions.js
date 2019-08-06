@@ -1,5 +1,6 @@
-import ActionTypes from './ActionTypes';
+import * as ActionTypes from './ActionTypes';
 import * as courseApi from '../../api/courseApi';
+import { beginApiCall, apiCallFailed } from './apiStatusActions';
 
 // export function createCourse(course) {
 //   //debugger;
@@ -21,6 +22,7 @@ export function loadCourseSuccess(loadedCourses) {
 export function loadCourses() {
   // dispatch is injected by thunk middleware
   return function(dispatch) {
+    dispatch(beginApiCall());
     //debugger;
     return courseApi
       .getCourses()
@@ -30,6 +32,7 @@ export function loadCourses() {
       })
       .catch(error => {
         console.error(error);
+        dispatch(apiCallFailed());
         // We can also dispatch error as another dispatcher call if we want
         throw error;
       });
@@ -50,8 +53,16 @@ export function createCourseSuccess(savedCourse) {
   };
 }
 
+export function deleteCourseOptimistic(course) {
+  return {
+    type: ActionTypes.DELETE_COURSE_OPTIMISTIC,
+    course: course
+  };
+}
+
 export function saveCourse(course) {
   return function(dispatch, getState) {
+    dispatch(beginApiCall());
     return courseApi
       .saveCourse(course)
       .then(savedCourse => {
@@ -61,7 +72,15 @@ export function saveCourse(course) {
       })
       .catch(error => {
         console.error('error while saving course: ' + error);
+        dispatch(apiCallFailed());
         throw error;
       });
+  };
+}
+
+export function deleteCourse(course) {
+  return function(dispatch) {
+    dispatch(deleteCourseOptimistic(course));
+    return courseApi.deleteCourse(course.id);
   };
 }

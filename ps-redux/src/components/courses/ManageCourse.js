@@ -5,8 +5,12 @@ import * as authorActions from '../../redux/actions/authorActions';
 import PropTypes from 'prop-types';
 import CourseForm from './CourseForm';
 import { newCourse } from '../../../tools/mockData';
+import Spinner from '../common/spinner/Spinner';
 
-function ManageCourse({
+// Now we are exporting two things
+// One without Connect and
+// other with Connect - its at bottom
+export function ManageCourse({
   courses,
   authors,
   loadCourses,
@@ -18,7 +22,8 @@ function ManageCourse({
   // lets use the destructuring at top
   // const { courses, authors, loadCourses, loadAuthors } = props;
   const [course, setCourse] = useState({ ...props.course });
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     debugger;
@@ -39,8 +44,23 @@ function ManageCourse({
     // this is same as componentDidMount method
   }, [props.course]);
 
+  const isFormValid = () => {
+    const { title, category, authorId } = course;
+    const errors = {};
+
+    if (!title) errors.title = 'Title is required !';
+    if (!category) errors.category = 'Category is required !';
+    if (!authorId) errors.author = 'Author is required !';
+
+    setErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = event => {
     const { name, value } = event.target;
+    // If we want stuff instant, then you can enable this too
+    //isFormValid();
     setCourse(prevCourse => ({
       ...prevCourse,
       // This is named property syntax, so its its authorId then
@@ -55,12 +75,22 @@ function ManageCourse({
     // dispatch is already bind by the mapDispatchToProps
     // This returns a promise, so i can use .thne
     //saveCourse(course);
-    saveCourse(course).then(() => {
-      history.push('/courses');
-    });
+    if (!isFormValid()) return;
+
+    setSaving(true);
+    saveCourse(course)
+      .then(() => {
+        history.push('/courses');
+      })
+      .catch(error => {
+        setSaving(false);
+        setErrors({ onSave: error.message });
+      });
   };
 
-  return (
+  return authors.length === 0 || courses.length === 0 ? (
+    <Spinner />
+  ) : (
     <>
       <CourseForm
         authors={authors}
@@ -68,6 +98,7 @@ function ManageCourse({
         errors={errors}
         onChange={handleChange}
         onSave={handleSave}
+        saving={saving}
       />
     </>
   );

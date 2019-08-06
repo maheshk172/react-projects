@@ -7,6 +7,8 @@ import { bindActionCreators } from 'redux';
 import { Redirect } from 'react-router-dom';
 
 import CourseList from './CourseList';
+import Spinner from '../common/spinner/Spinner';
+import { toast } from 'react-toastify';
 
 class CoursesPage extends React.Component {
   state = {
@@ -31,21 +33,49 @@ class CoursesPage extends React.Component {
     }
   }
 
+  // using promises
+  handleDeleteCourse = course => {
+    toast.success('course deleted');
+    this.props.courseActions.deleteCourse(course).catch(error => {
+      toast.error('course deletion failed : ' + error);
+    });
+  };
+
+  // using async + await
+  // I am using traditional try + catch here, its marked
+  handleDeleteCourse1 = async course => {
+    toast.success('course deleted');
+    try {
+      await this.props.courseActions.deleteCourse(course);
+    } catch (error) {
+      toast.error('course deletion failed : ' + error, { autoClose: false });
+    }
+  };
+
   render() {
     return (
       <>
         {/* Instead of using Link, we have used redirect mechanism to redirect user to /course */}
         {this.state.redirectToAddCoursesPage && <Redirect to="/course" />}
         <h2> Courses </h2>
-        <button
-          style={{ marginBottom: '20px' }}
-          className="btn btn-primary add-course"
-          onClick={() => this.setState({ redirectToAddCoursesPage: true })}
-        >
-          Add Course
-        </button>
 
-        <CourseList courses={this.props.courses} />
+        {this.props.loading ? (
+          <Spinner />
+        ) : (
+          <>
+            <button
+              style={{ marginBottom: '20px' }}
+              className="btn btn-primary add-course"
+              onClick={() => this.setState({ redirectToAddCoursesPage: true })}
+            >
+              Add Course
+            </button>
+            <CourseList
+              courses={this.props.courses}
+              onDeleteClick={this.handleDeleteCourse}
+            />
+          </>
+        )}
       </>
     );
   }
@@ -61,7 +91,9 @@ const mapDispatchToProps = dispatch => {
 
 // ownprops - component's own props
 const mapStateToProps = state => {
-  //debugger;
+  debugger;
+  console.log('state.apiCallsInProgress: ' + state.apiCallsInProgress);
+  console.log('state: ' + JSON.stringify(state));
   return {
     courses:
       state.authors.length === 0
@@ -72,13 +104,15 @@ const mapStateToProps = state => {
               authorName: state.authors.find(a => a.id === course.authorId).name
             };
           }),
-    authors: state.authors
+    authors: state.authors,
+    loading: state.apiCallsInProgress > 0
   };
 };
 
 CoursesPage.propTypes = {
   courses: PropTypes.array.isRequired,
   authors: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
   courseActions: PropTypes.object.isRequired,
   authorActions: PropTypes.object.isRequired
 };
