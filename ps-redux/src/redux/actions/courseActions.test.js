@@ -14,7 +14,8 @@ const mockStore = configureMockStore(middleware);
 describe('async actions', () => {
   afterEach(() => {
     // resutoring mock after every test
-    mockStore.restore();
+    // API is not listed
+    // mockStore.restore();
   });
 
   describe('Load Courses Thunk', () => {
@@ -26,7 +27,7 @@ describe('async actions', () => {
 
       const expectedActions = [
         { type: ActionTypes.BEGIN_API_CALL },
-        { type: ActionTypes.LOAD_AUTHORS_SUCCESS, courses }
+        { type: ActionTypes.LOAD_COURSES_SUCCES, courses }
       ];
 
       const store = mockStore({ courses: [] });
